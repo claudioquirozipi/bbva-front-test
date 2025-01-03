@@ -1,4 +1,9 @@
+import { cx } from "class-variance-authority";
+import { Edit, Delete } from "lucide-react";
 import { useState } from "react";
+
+import useClientContext from "@/context/client-context";
+
 import {
   Table,
   TableBody,
@@ -10,7 +15,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -18,78 +22,22 @@ import {
 } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-// Definir el tipo para un cliente
-type Client = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  city: string;
-  clientType: string;
-};
-
-// Datos de ejemplo
-const clients: Client[] = [
-  {
-    id: 1,
-    name: "Juan Pérez",
-    email: "juan@example.com",
-    phone: "123-456-7890",
-    city: "Madrid",
-    clientType: "Premium",
-  },
-  {
-    id: 2,
-    name: "María García",
-    email: "maria@example.com",
-    phone: "098-765-4321",
-    city: "Barcelona",
-    clientType: "Standard",
-  },
-  {
-    id: 3,
-    name: "Carlos López",
-    email: "carlos@example.com",
-    phone: "111-222-3333",
-    city: "Valencia",
-    clientType: "Premium",
-  },
-  {
-    id: 4,
-    name: "Ana Martínez",
-    email: "ana@example.com",
-    phone: "444-555-6666",
-    city: "Sevilla",
-    clientType: "Standard",
-  },
-  {
-    id: 5,
-    name: "Pedro Sánchez",
-    email: "pedro@example.com",
-    phone: "777-888-9999",
-    city: "Bilbao",
-    clientType: "Premium",
-  },
-  // Añade más clientes aquí para probar la paginación
-];
+import { Badge } from "@/components/ui/badge";
 
 export default function ClientPage() {
+  const { clients, setClients } = useClientContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 5;
 
-  // Filtrar clientes basado en el término de búsqueda
   const filteredClients = clients.filter((client) =>
     Object.values(client).some((value) =>
       value.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
 
-  // Calcular el total de páginas
   const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
 
-  // Obtener los clientes para la página actual
   const currentClients = filteredClients.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -111,7 +59,6 @@ export default function ClientPage() {
         <Button onClick={() => setSearchTerm("")}>Limpiar</Button>
       </div>
 
-      {/* Tabla de clientes */}
       <Table>
         <TableHeader>
           <TableRow>
@@ -120,6 +67,7 @@ export default function ClientPage() {
             <TableHead>Teléfono</TableHead>
             <TableHead>Ciudad</TableHead>
             <TableHead>Tipo de Cliente</TableHead>
+            <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -129,19 +77,48 @@ export default function ClientPage() {
               <TableCell>{client.email}</TableCell>
               <TableCell>{client.phone}</TableCell>
               <TableCell>{client.city}</TableCell>
-              <TableCell>{client.clientType}</TableCell>
+              <TableCell>
+                <Badge
+                  className={cx({
+                    "bg-green-500": client.clientType === "Premium",
+                    "bg-blue-500": client.clientType === "Standard",
+                  })}
+                >
+                  {client.clientType}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Button
+                  className="bg-orange-500"
+                  onClick={() => {
+                    console.log(client.id);
+                    // history.push(`/client/edit/${client.id}`);
+                  }}
+                >
+                  <Edit />
+                </Button>
+                <Button
+                  className="ml-2 bg-red-500"
+                  onClick={() => {
+                    setClients((prev) =>
+                      prev.filter((item) => item.id !== client.id)
+                    );
+                  }}
+                >
+                  <Delete />
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
-      {/* Paginación */}
       <Pagination className="mt-4">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              //   disabled={currentPage === 1}
+              // disabled={currentPage === 1}
             />
           </PaginationItem>
           {[...Array(totalPages)].map((_, i) => (
