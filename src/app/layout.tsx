@@ -1,4 +1,8 @@
+import { Home, UserPlus, Users, Settings, LogOut, Menu } from "lucide-react";
 import { Outlet, Link } from "react-router";
+import { useNavigate } from "react-router";
+import { useState } from "react";
+
 import {
   Sheet,
   SheetContent,
@@ -6,9 +10,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Home, UserPlus, Users, Settings, LogOut, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function Layout() {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   const navItems = [
     { name: "Inicio", href: "/", icon: <Home className="h-5 w-5" /> },
     {
@@ -26,11 +32,6 @@ function Layout() {
       href: "/setting",
       icon: <Settings className="h-5 w-5" />,
     },
-    {
-      name: "Cerrar Sesión",
-      href: "/auth/login",
-      icon: <LogOut className="h-5 w-5" />,
-    },
   ];
   return (
     <div className="min-h-screen grid grid-rows-[auto,1fr,auto]">
@@ -38,7 +39,7 @@ function Layout() {
         <div className="container mx-auto flex items-center justify-between p-4">
           <div className="text-lg font-bold">Sistema de clientes</div>
 
-          <Sheet>
+          <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Menu className="h-5 w-5" />
             </SheetTrigger>
@@ -51,6 +52,7 @@ function Layout() {
               <nav className="flex flex-col space-y-4 p-4">
                 {navItems.map((item) => (
                   <Link
+                    onClick={() => setOpen(false)}
                     key={item.name}
                     to={item.href}
                     className="flex items-center space-x-2 hover:text-blue-500"
@@ -59,6 +61,17 @@ function Layout() {
                     <span>{item.name}</span>
                   </Link>
                 ))}
+                <Button
+                  className="bg-red-500 text-white flex items-center space-x-2"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    navigate("/auth/login");
+                  }}
+                >
+                  <LogOut className="h-5 w-5" />
+                  <span>Cerrar Sesión</span>
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
