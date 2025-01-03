@@ -1,8 +1,10 @@
 import { cx } from "class-variance-authority";
 import { Edit, Delete } from "lucide-react";
+import { useNavigate } from "react-router";
 import { useState } from "react";
 
 import useClientContext from "@/context/client-context";
+import type { Client } from "./data/client";
 
 import {
   Table,
@@ -20,6 +22,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +38,10 @@ export default function ClientPage() {
   const { clients, setClients } = useClientContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const itemsPerPage = 5;
+  const navigate = useNavigate();
 
   const filteredClients = clients.filter((client) =>
     Object.values(client).some((value) =>
@@ -44,10 +57,39 @@ export default function ClientPage() {
   );
 
   return (
-    <div className="container mx-auto p-4">
+    <div>
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              ¿Estás seguro de eliminar el cliente del id: {clientToDelete?.id}?
+            </DialogTitle>
+            <DialogDescription>
+              Esta acción no se puede deshacer. El elemento será eliminado
+              permanentemente.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setOpenDialog(false)} variant="outline">
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setClients((prev) =>
+                  prev.filter((client) => client.id !== clientToDelete?.id)
+                );
+                setOpenDialog(false);
+                setClientToDelete(null);
+              }}
+            >
+              Eliminar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <h1 className="text-2xl font-bold mb-4">Tabla de Clientes</h1>
 
-      {/* Barra de búsqueda */}
       <div className="flex mb-4">
         <Input
           type="text"
@@ -91,8 +133,7 @@ export default function ClientPage() {
                 <Button
                   className="bg-orange-500"
                   onClick={() => {
-                    console.log(client.id);
-                    // history.push(`/client/edit/${client.id}`);
+                    navigate(`/client/edit/${client.id}`);
                   }}
                 >
                   <Edit />
@@ -100,9 +141,8 @@ export default function ClientPage() {
                 <Button
                   className="ml-2 bg-red-500"
                   onClick={() => {
-                    setClients((prev) =>
-                      prev.filter((item) => item.id !== client.id)
-                    );
+                    setClientToDelete(client);
+                    setOpenDialog(true);
                   }}
                 >
                   <Delete />
@@ -118,7 +158,6 @@ export default function ClientPage() {
           <PaginationItem>
             <PaginationPrevious
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              // disabled={currentPage === 1}
             />
           </PaginationItem>
           {[...Array(totalPages)].map((_, i) => (
@@ -136,7 +175,6 @@ export default function ClientPage() {
               onClick={() =>
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
-              //   disabled={currentPage === totalPages}
             />
           </PaginationItem>
         </PaginationContent>

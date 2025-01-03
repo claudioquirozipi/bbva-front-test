@@ -4,8 +4,10 @@ export interface Client {
   email: string;
   phone: string;
   city: string;
-  clientType: string;
+  clientType: ClientType;
 }
+
+export type ClientType = "Premium" | "Standard";
 
 export const clients: Client[] = [
   {

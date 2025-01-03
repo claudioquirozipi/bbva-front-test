@@ -1,8 +1,12 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
+
+import useClientContext from "@/context/client-context";
+import type { Client } from "../data/client";
+
 import {
   Form,
   FormControl,
@@ -20,8 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import { Toast } from "@/components/ui/toast";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -36,42 +39,59 @@ const formSchema = z.object({
   city: z.string().min(2, {
     message: "La ciudad debe tener al menos 2 caracteres.",
   }),
-  clientType: z.enum(["premium", "standard"], {
+  clientType: z.enum(["Premium", "Standard"], {
     required_error: "Por favor, selecciona un tipo de cliente.",
   }),
 });
 
-export default function ClientCreateEditForm() {
+interface ClientCreateEditFormProps {
+  action: "create" | "edit";
+  client?: Client;
+}
+
+export default function ClientCreateEditForm(props: ClientCreateEditFormProps) {
+  const { action, client } = props;
+  const { setClients } = useClientContext();
+  const navigate = useNavigate();
+  const defaultValues = client ?? {
+    id: 0,
+    name: "",
+    email: "",
+    phone: "",
+    city: "",
+    clientType: "Premium",
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      city: "",
-      clientType: undefined,
-    },
+    defaultValues,
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Aquí iría la lógica para enviar los datos al servidor
-    console.log(values);
+    if (action === "create") {
+      setClients((clients) => [
+        ...clients,
+        { id: Math.round(Math.random() * 1000), ...values },
+      ]);
+    }
+    if (action === "edit") {
+      setClients((clients) =>
+        clients.map((c) => (c.id === client?.id ? { ...c, ...values } : c))
+      );
+    }
     setTimeout(() => {
       setIsSubmitting(false);
-      toast({
-        title: "Cliente creado",
-        description: "El cliente ha sido creado exitosamente.",
-      });
+      navigate("/client");
       form.reset();
-    }, 2000); // Simulamos una demora de 2 segundos
+    }, 2000);
   }
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Crear Nuevo Cliente</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        {action === "create" ? "Crear cliente" : "Editar cliente"}
+      </h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -156,8 +176,8 @@ export default function ClientCreateEditForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="premium">Premium</SelectItem>
-                    <SelectItem value="standard">Standard</SelectItem>
+                    <SelectItem value="Premium">Premium</SelectItem>
+                    <SelectItem value="Standard">Standard</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>
@@ -168,7 +188,13 @@ export default function ClientCreateEditForm() {
             )}
           />
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creando..." : "Crear Cliente"}
+            {isSubmitting
+              ? action === "create"
+                ? "Creando..."
+                : "Actualizando..."
+              : action === "create"
+              ? "Crear"
+              : "Actualizar"}
           </Button>
         </form>
       </Form>

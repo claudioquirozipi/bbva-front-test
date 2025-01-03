@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router";
-import LoginPage from "./auth/login";
-import ClientPage from "./client/list";
+
+import { ClientProvider } from "@/context/client-context";
 import CreateClientPage from "./client/create";
 import EditClientPage from "./client/edit";
+import ClientPage from "./client/list";
+import LoginPage from "./auth/login";
 import Layout from "./layout";
-import { ClientProvider } from "@/context/client-context";
 
 function App() {
   return (
