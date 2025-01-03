@@ -1,50 +1,82 @@
-# React + TypeScript + Vite
+# Vite Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este es un proyecto creado con [Vite](https://vitejs.dev/), diseñado para demostrar una autenticación básica.
 
-Currently, two official plugins are available:
+## Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework**: Vite para desarrollo rápido y eficiente.
+- **Autenticación**: Un usuario predefinido para pruebas.
 
-## Expanding the ESLint configuration
+### Usuario de Prueba
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Correo**: `admin@example.com`
+- **Contraseña**: `123456`
 
-- Configure the top-level `parserOptions` property like this:
+## Requisitos Previos
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+Asegúrate de tener instalado lo siguiente:
+
+- [Node.js](https://nodejs.org/) (versión 14 o superior)
+- [npm](https://www.npmjs.com/) (se incluye con Node.js)
+
+## Instalación
+
+1. Clona el repositorio en tu máquina local:
+
+   ```bash
+   git clone https://github.com/claudioquirozipi/bbva-front-test.git
+   ```
+
+2. Navega al directorio del proyecto:
+
+   ```bash
+   cd bbva-front-test
+   ```
+
+3. Instala las dependencias necesarias:
+   ```bash
+   npm install
+   ```
+
+## Ejecución en Local
+
+Para iniciar el servidor de desarrollo:
+
+```bash
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+El proyecto estará disponible en [http://localhost:5173](http://localhost:5173).
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Uso
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+1. Inicia el proyecto en tu navegador accediendo a la URL proporcionada.
+2. Ingresa las credenciales del usuario predefinido para autenticación.
+
+## Scripts Disponibles
+
+- `npm install`: Instala las dependencias del proyecto.
+- `npm run dev`: Inicia el servidor de desarrollo.
+- `npm run build`: Genera los archivos de producción.
+- `npm run preview`: Previsualiza la aplicación construida.
+
+## Contribución
+
+1. Haz un fork del repositorio.
+2. Crea una rama para tu característica:
+   ```bash
+   git checkout -b feature/nueva-caracteristica
+   ```
+3. Realiza tus cambios y haz un commit:
+   ```bash
+   git commit -m "Agrega nueva característica"
+   ```
+4. Sube tus cambios:
+   ```bash
+   git push origin feature/nueva-caracteristica
+   ```
+5. Abre un Pull Request en el repositorio principal.
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia MIT. Consulta el archivo `LICENSE` para más información.
